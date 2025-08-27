@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>CSS Study Test Page</title>
+    </head>
+<style>
+    html {
+        font-size: 16px;
+    }
+
+    p {
+        font-size: 1em;
+    }
+
+    .content1 {
+        font-size: 1.5em;
+    }
+    .content2 {
+        font-size: 1.8em;
+        width:1600px;
+        border: 1px solid #111
+    }
+    .top{
+        /* max-width: 200px;  << 이 부분이 없으면 이미지가 원래 사이즈로 나옴 */
+        object-fit: cover;
+        object-fit: fill;
+        height: auto;
+    }
+    @media screen and (max-width: 1024px) {
+        body{
+            background-color: #a9c91c;
+        }
+        .notview{
+            display: none;
+        }
+    }
+</style>
+
+<body>
+    <h1>TEST</h1>
+    <p>TestTestTestTestTestTest 1em</p>
+    <div class="content1">
+        <p>TestTestTestTestTestTest1.5em</p>
+        
+    </div>
+    <div class="content2">
+        <img src="image/login-bg.png" class="top notview">
+    </div>
+</body>
+
+</html>
