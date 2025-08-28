@@ -1,0 +1,41 @@
+body {
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  margin: 0;
+  padding: 20px;
+  background: #f9fafb;
+  color: #333;
+}
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.todo-list {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid #1791dd;
+  border-radius: 6px;
+  padding: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+.task {
+  padding: 12px;
+  margin: 8px 0;
+  background: #f1f5f9;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  cursor: grab;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.task:active {
+  cursor: grabbing;
+}
+.task:hover {
+  background: #e0f2fe;
+  transform: scale(1.02);
+}
+/* 드래그 오버 시 강조 */
+.drag-over {
+  border: 2px dashed #1791dd;
+  background: #fefce8;
+}

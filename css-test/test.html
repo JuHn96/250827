@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>식단표</title>
+    <style>
+        body {
+            font-family: "Pretendard", "Noto Sans KR", sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #F9FAFB;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .meal-plan {
+            display: grid;
+            
+            grid-template-columns: 120px repeat(7, 1fr);
+            /* grid-template-columns: 120px repeat(auto-fit, minmax(100px, 1fr)); */
+
+            border: 1px solid #1791DD;
+            border-radius: 6px;
+            /* overflow: hidden; */
+            /* :흰색_확인_표시: 스크롤 허용 */
+            overflow-x: auto;
+            /* 가로 스크롤 */
+            overflow-y: auto;
+            /* 세로 스크롤 */
+        }
+        .meal-plan .header {
+            background: #222;
+            color: white;
+            font-weight: bold;
+        }
+        .meal-plan .meal-type {
+            background: #F1F5F9;
+            font-weight: bold;
+        }
+        .meal-plan div {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* :흰색_확인_표시: 부드러운 머터리얼 곡선 */
+        }
+        .meal-plan div:hover {
+            background: #FEF3C7;
+            transform: scale(1.08) rotate(-1deg);
+            /* :흰색_확인_표시: 확대 + 살짝 기울이기 */
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            /* :흰색_확인_표시: 그림자 입체감 */
+        }
+        /* 반응형 */
+        @media (max-width: 768px) {
+            .meal-plan {
+                grid-template-columns: 80px repeat(3, 1fr);
+            }
+            .meal-plan div {
+                font-size: 20px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>:포크와_나이프: 일주일 식단표</h1>
+    <div class="meal-plan">
+        <!-- 요일 -->
+        <div class="header">구분</div>
+        <div class="header">월</div>
+        <div class="header">화</div>
+        <div class="header">수</div>
+        <div class="header">목</div>
+        <div class="header">금</div>
+        <div class="header">토</div>
+        <div class="header">일</div>
+        <!-- 아침 -->
+        <div class="meal-type">아침</div>
+        <div>샐러드<br>스크램블</div>
+        <div>시리얼<br>우유</div>
+        <div>토스트<br>계란</div>
+        <div>과일<br>요거트</div>
+        <div>김밥<br>미소국 미소국 미소국 미소국 미소국 미소국 미소국 미소국 미소국미소국미소국</div>
+        <div>팬케이크<br>딸기</div>
+        <div>한식죽<br>김치</div>
+        <!-- 점심 -->
+        <div class="meal-type">점심</div>
+        <div>비빔밥<br>된장국</div>
+        <div>돈까스<br>샐러드</div>
+        <div>파스타<br>스프</div>
+        <div>불고기덮밥</div>
+        <div>삼겹살<br>쌈채소</div>
+        <div>라멘</div>
+        <div>쌀국수</div>
+        <!-- 저녁 -->
+        <div class="meal-type">저녁</div>
+        <div>닭가슴살<br>샐러드</div>
+        <div>초밥 세트</div>
+        <div>된장찌개<br>잡곡밥</div>
+        <div>치킨<br>콜라</div>
+        <div>칼국수<br>김치전</div>
+        <div>스테이크</div>
+        <div>탕수육<br>짜장면</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grid To‑Do List (날짜 버튼형 + 목차)</title>
+<style>
+:root{
+  --bg:#0f1724; --card:#0b1220; --accent:#7c3aed; --muted:#9aa4b2;
+  --glass: rgba(255,255,255,0.03);
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+}
+*{box-sizing:border-box; transition: all 0.2s ease;}
+html,body{height:100%; margin:0; background:linear-gradient(180deg,#071124 0%, #081028 100%); color:#e6edf3}
+.wrap{max-width:880px; margin:40px auto; padding:28px; background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent); border-radius:16px; box-shadow: 0 8px 30px rgba(2,6,23,0.8); border: 1px solid rgba(255,255,255,0.03);}
+header{display:grid; gap:8px; align-items:center; grid-template-columns: 1fr auto; margin-bottom:18px;}
+header h1{font-size:20px; margin:0}
+header p{margin:0; color:var(--muted); font-size:13px}
+.add-form{display:grid; grid-template-columns: 1fr 120px 120px 120px auto; gap:10px; align-items:center; margin-bottom:18px}
+.add-form input, .add-form textarea, .add-form select{width:100%; padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.04); background:var(--card); color:inherit; outline:none; font-size:14px;}
+.add-form button{padding:10px 14px; border-radius:10px; border:0; background:var(--accent); color:white; cursor:pointer}
+.date-btn{padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:var(--card); color:inherit; cursor:pointer; font-size:14px;}
+.list-header{display:grid; grid-template-columns:40px 1fr 160px; gap:12px; padding:10px 12px; color:var(--muted); font-size:13px}
+.todo-list{display:grid; gap:10px;}
+.task{display:grid; grid-template-columns:40px 1fr 160px; gap:12px; align-items:center; background:var(--glass); padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.02); transition: transform 0.3s ease, background 0.3s ease, opacity 0.3s ease;}
+.task:hover{transform:translateY(-3px)}
+.task .chk{grid-column:1 / 2; display:flex; align-items:center; justify-content:center;}
+.task input[type=checkbox]{width:18px; height:18px}
+.task .title{grid-column:2 / 3; font-size:15px; word-break:break-word;}
+.task .note{grid-column:2 / 4; font-size:13px; color:var(--muted); margin-top:6px; cursor:text;}
+.task .actions{grid-column:3 / 4; display:flex; gap:8px; justify-content:flex-end}
+.task button{background:transparent; border:0; color:var(--muted); cursor:pointer; padding:6px; border-radius:8px}
+.task button:hover{color:white; background:rgba(255,255,255,0.03)}
+.task.completed{opacity:0.6}
+.task.completed .title{ text-decoration:line-through; color:var(--muted); }
+.badge{display:inline-block; padding:6px 8px; font-size:12px; border-radius:999px; background:rgba(255,255,255,0.04)}
+.badge.high{color:#fff; background:linear-gradient(90deg,#ff416c,#ff4b2b)}
+.badge.med{color:#fff; background:linear-gradient(90deg,#f59e0b,#f97316)}
+.badge.low{color:#0f1724; background:rgba(255,255,255,0.12)}
+@media (max-width:520px){
+  .list-header{grid-template-columns:40px 1fr}
+  .task{grid-template-columns:40px 1fr}
+  .task .actions{display:none}
+  .task .note{grid-column:2/3}
+}
+.empty{padding:20px; text-align:center; color:var(--muted)}
+.over{border:2px dashed var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>Grid To‑Do List</h1>
+    <p>날짜 버튼형 / 메모 편집 / 목차 / 드래그 / 로컬 저장</p>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <small style="color:var(--muted)">총 <span id="count">0</span>개</small>
+  </div>
+</header>
+
+<form class="add-form" id="addForm">
+  <input id="taskInput" placeholder="새 할 일 입력">
+  <textarea id="noteInput" placeholder="메모" rows="1"></textarea>
+  <button type="button" id="dateBtn" class="date-btn">날짜 선택</button>
+  <select id="priorityInput">
+    <option value="high">높음</option>
+    <option value="med">중간</option>
+    <option value="low" selected>낮음</option>
+  </select>
+  <button type="submit">추가</button>
+  <input type="date" id="hiddenDate" style="display:none">
+</form>
+
+<div class="list-header">
+  <div></div>
+  <div>할 일</div>
+  <div style="text-align:right">작업</div>
+</div>
+
+<div class="todo-list" id="todoList">
+  <div class="empty" id="empty">새 작업을 추가해 보세요.</div>
+</div>
+</div>
+
+<script>
+const listEl = document.getElementById('todoList');
+const input = document.getElementById('taskInput');
+const noteInput = document.getElementById('noteInput');
+const dateBtn = document.getElementById('dateBtn');
+const hiddenDate = document.getElementById('hiddenDate');
+const form = document.getElementById('addForm');
+const priInput = document.getElementById('priorityInput');
+const countEl = document.getElementById('count');
+const empty = document.getElementById('empty');
+
+let tasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+if(tasks.length === 0){
+  tasks = [
+    {id:crypto.randomUUID(), title:'디자인 피드백', note:'헤더 폰트 조정', date:'2025-09-01', priority:'high', done:false},
+    {id:crypto.randomUUID(), title:'배포 스크립트 점검', note:'CI/CD 로그', date:'2025-09-02', priority:'med', done:false},
+    {id:crypto.randomUUID(), title:'팀 회의 준비', note:'어젠다 3개', date:'2025-09-03', priority:'low', done:true}
+  ];
+  localStorage.setItem('tasks', JSON.stringify(tasks));
+}
+
+let dragSrcEl = null;
+function saveTasks(){ localStorage.setItem('tasks', JSON.stringify(tasks)); }
+
+function handleDragStart(e){ dragSrcEl=this; e.dataTransfer.effectAllowed='move'; this.style.opacity='0.5'; this.style.transform='scale(1.02)'; }
+function handleDragOver(e){ if(e.preventDefault) e.preventDefault(); e.dataTransfer.dropEffect='move'; return false; }
+function handleDragEnter(){ this.classList.add('over'); }
+function handleDragLeave(){ this.classList.remove('over'); }
+function handleDrop(e){ if(e.stopPropagation) e.stopPropagation(); if(dragSrcEl!=this){ const fromId=dragSrcEl.dataset.id; const toId=this.dataset.id; const fromIndex=tasks.findIndex(t=>t.id===fromId); const toIndex=tasks.findIndex(t=>t.id===toId); tasks.splice(toIndex,0,tasks.splice(fromIndex,1)[0]); saveTasks(); render(); } return false; }
+function handleDragEnd(){ this.style.opacity='1'; this.style.transform='scale(1)'; document.querySelectorAll('.task').forEach(item=>item.classList.remove('over')); }
+
+dateBtn.addEventListener('click',()=> hiddenDate.click());
+hiddenDate.addEventListener('change',()=>{ dateBtn.textContent = hiddenDate.value; });
+
+function render(){
+  listEl.innerHTML='';
+  if(tasks.length===0){ empty.style.display='block'; } else { empty.style.display='none'; }
+  tasks.forEach(t=>{
+    const el=document.createElement('div'); el.className='task'+(t.done?' completed':''); el.setAttribute('draggable','true'); el.dataset.id=t.id;
+    el.addEventListener('dragstart',handleDragStart); el.addEventListener('dragenter',handleDragEnter);
+    el.addEventListener('dragover',handleDragOver); el.addEventListener('dragleave',handleDragLeave);
+    el.addEventListener('drop',handleDrop); el.addEventListener('dragend',handleDragEnd);
+
+    const chk=document.createElement('div'); chk.className='chk'; const cb=document.createElement('input'); cb.type='checkbox'; cb.checked=t.done; cb.addEventListener('change',()=>{ toggle(t.id); }); chk.appendChild(cb);
+
+    const titleWrap=document.createElement('div'); titleWrap.className='title'; 
+    const title=document.createElement('div'); title.textContent=t.title;
+    const small=document.createElement('div'); small.className='note'; small.contentEditable=true; small.textContent=t.note||''; small.addEventListener('input',()=>{ updateNote(t.id, small.textContent); });
+
+    const badge=document.createElement('span'); badge.className='badge '+(t.priority||'low'); badge.textContent=(t.priority==='high'?'높음':t.priority==='med'?'중간':'낮음');
+
+    const dateBtnTask = document.createElement('button'); dateBtnTask.className='date-btn'; dateBtnTask.textContent=t.date||'날짜 선택';
+    const hiddenInputTask = document.createElement('input'); hiddenInputTask.type='date'; hiddenInputTask.style.display='none'; hiddenInputTask.value=t.date||'';
+    dateBtnTask.addEventListener('click',()=> hiddenInputTask.click());
+    hiddenInputTask.addEventListener('change',()=>{ t.date=hiddenInputTask.value; dateBtnTask.textContent=t.date; saveTasks(); });
+
+    titleWrap.appendChild(title); titleWrap.appendChild(small); titleWrap.appendChild(dateBtnTask); titleWrap.appendChild(hiddenInputTask);
+
+    const actions=document.createElement('div'); actions.className='actions';
+    const pri=document.createElement('div'); pri.appendChild(badge);
+
+    const btnDel=document.createElement('button'); btnDel.innerHTML='삭제'; btnDel.title='삭제'; btnDel.addEventListener('click',()=>{ removeTask(t.id); });
+
+    const btnIndex=document.createElement('button'); btnIndex.innerHTML='목차'; btnIndex.title='목차 확인'; 
+    btnIndex.addEventListener('click',()=>{ alert(`제목: ${t.title}\n메모: ${t.note}\n우선순위: ${t.priority}\n시작일: ${t.date||'-'}`); });
+
+    actions.appendChild(pri); actions.appendChild(btnIndex); actions.appendChild(btnDel);
+
+    el.appendChild(chk); el.appendChild(titleWrap); el.appendChild(actions);
+    listEl.appendChild(el);
+  });
+  countEl.textContent=tasks.length;
+}
+
+function addTask(title,note,date){
+  if(!title||!title.trim()) return;
+  tasks.unshift({id:crypto.randomUUID(), title:title.trim(), note:note.trim(), date:date, priority:priInput.value, done:false});
+  saveTasks(); render();
+}
+function removeTask(id){ tasks=tasks.filter(t=>t.id!==id); saveTasks(); render(); }
+function toggle(id){ tasks=tasks.map(t=>t.id===id?{...t, done:!t.done}:t); saveTasks(); render(); }
+function updateNote(id,note){ tasks=tasks.map(t=>t.id===id?{...t,note:note}:t); saveTasks(); }
+
+form.addEventListener('submit', e=>{ e.preventDefault(); addTask(input.value,noteInput.value,hiddenDate.value); input.value=''; noteInput.value=''; hiddenDate.value=''; dateBtn.textContent='날짜 선택'; });
+
+render();
+</script>
+</body>
+</html>
