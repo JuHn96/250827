@@ -83,4 +83,25 @@
         <button class="btn-save">Logout</button>
     </div>
 </body>
+<script>  // 창 띄우기 함수
+let newWin; // 전역 변수
+
+function moveWin() {
+    newWin = window.open("http://www.naver.com", "popup", "width=800,height=300");
+    if (newWin) {
+        newWin.moveTo(1000, 1000);
+    }
+
+    // 3초 후 창 닫기
+    setTimeout(() => {
+        if (newWin && !newWin.closed) {
+            newWin.close();
+            console.log("환경 설정 닫혔습니다!");
+        }
+    }, 3000);
+}
+
+moveWin(); // 함수 호출 시 실행
+</script>
+
 </html>
