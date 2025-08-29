@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+</body>
+<script>
+    function isMobile() {
+        const ua = navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod|android|windows phone|blackberry|mobile/i.test(ua);
+    }
+    if (isMobile()) {
+        console.log(":아이폰: 모바일 브라우저");
+        //location.href="http://m.naver.com";
+        document.body.style.backgroundColor = "#F0F9FF";
+    } else {
+        console.log(":컴퓨터: PC 브라우저");
+        //location.href="http://www.naver.com";
+        console.log(" location.protocol - " , location.protocol);
+        console.log(" location.port - " , location.port);
+        document.body.style.backgroundColor = "#000";
+    }
+</script>
+</html>
