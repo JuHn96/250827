@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      font-family: Pretendard, sans-serif;
+    }
+    .tooltip {
+      position: absolute;
+      background: rgba(0,0,0,0.8);
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 14px;
+      white-space: nowrap;
+      pointer-events: none; /* 마우스 이벤트 방해 안함 */
+      transform: translate(10px, 10px); /* 클릭 위치 살짝 옆에 표시 */
+    }
+  </style>
+</head>
+<body>
+  <h1>클릭하면 툴팁 표시</h1>
+  <p>아무 곳이나 클릭해 보세요.</p>
+  <script>
+    // 기존 툴팁이 있으면 제거
+    function removeTooltip() {
+      const oldTip = document.querySelector(".tooltip");
+      if (oldTip) oldTip.remove();
+    }
+    document.addEventListener("click", function (e) {
+      removeTooltip();
+      // 툴팁 생성
+      const tooltip = document.createElement("div");
+      tooltip.className = "tooltip";
+      tooltip.textContent = `X: ${e.pageX}, Y: ${e.pageY}`;
+      // 좌표 설정
+      tooltip.style.left = e.pageX + "px";
+      tooltip.style.top = e.pageY + "px";
+      document.body.appendChild(tooltip);
+      // 2초 후 자동 제거
+      setTimeout(removeTooltip, 2000);
+    });
+  </script>
+</body>
+</html>
