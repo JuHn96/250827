@@ -1,0 +1,27 @@
+<html>
+<link rel="stylesheet" href="css/reset.css">
+<style>
+
+</style>
+<body style="padding:100px; font-size:20px;">
+    <ul id="itemList">
+        <li>Save</li>
+        <li>Test</li>
+        <li>Login</li>
+    </ul>
+</body>
+<script>
+    let newItem = document.createElement("li");
+    let textNode =document.createTextNode("Remove");
+    
+    function print(){
+        newItem.appendChild(textNode);
+
+        document.querySelctor('ul').appendChild(newItem);
+
+        console.log(document.querySelectorAll("li"));
+    }
+    print()
+</script>
+
+</html>
